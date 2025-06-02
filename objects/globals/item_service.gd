@@ -16,12 +16,35 @@ var linked_items: Array = [
 	]
 ]
 
+const POOL_PATHS: Array[String] = [
+	"res://objects/items/pools/accessories.tres",
+	"res://objects/items/pools/active_items.tres",
+	"res://objects/items/pools/battle_clears.tres",
+	"res://objects/items/pools/candies.tres",
+	"res://objects/items/pools/doodle_treasure.tres",
+	"res://objects/items/pools/everything.tres",
+	"res://objects/items/pools/floor_clears.tres",
+	"res://objects/items/pools/item_roll_fails.tres",
+	"res://objects/items/pools/jellybeans.tres",
+	"res://objects/items/pools/progressives.tres",
+	"res://objects/items/pools/rewards.tres",
+	"res://objects/items/pools/shop_progressives.tres",
+	"res://objects/items/pools/shop_rewards.tres",
+	"res://objects/items/pools/special_items.tres",
+	"res://objects/items/pools/super_candies.tres",
+	"res://objects/items/pools/toontasks.tres",
+	"res://objects/items/pools/treasures.tres",
+]
+
+var POOLS: Dictionary[String, ItemPool] = {}
+
+
+
+
 func _init():
-	GameLoader.queue_into(
-		GameLoader.Phase.GAMEPLAY, self, {
-			'BEAN_POOL': 'res://objects/items/pools/jellybeans.tres',
-		}
-	)
+	# Assign our item pools
+	for path in POOL_PATHS:
+		create_centralized_pool(path)
 
 func _ready() -> void:
 	# Clear out temp seen items upon every floor start
@@ -33,8 +56,6 @@ func reset() -> void:
 	items_in_play.clear()
 
 func get_random_item(pool: ItemPool, override_rolls := false) -> Item:
-	## Meowmers needs to start with a doodle...
-	
 	## Rolls to force progression items when they're needed:
 	if not override_rolls:
 		# Gag roll
@@ -55,7 +76,8 @@ func get_random_item(pool: ItemPool, override_rolls := false) -> Item:
 			#print('Forcing bean spawn')
 			#return get_random_item(BEAN_POOL, true)
 	
-	
+	# Get the centralized version of the pool
+	pool = get_centralized_pool(pool)
 	
 	# 50% chance to remove all active items from the pool
 	var exclude_actives := not override_rolls and RandomService.randi_channel('active_item_discard') % 2 == 0
@@ -65,6 +87,8 @@ func get_random_item(pool: ItemPool, override_rolls := false) -> Item:
 	var lowest_rarity := pool.get_lowest_rarity()
 	if rarity_goal < lowest_rarity:
 		rarity_goal = lowest_rarity
+	if not pool.low_roll_override == Item.Rarity.NIL:
+		rarity_goal = pool.low_roll_override as int
 	
 	# Trim out all seen items from pool
 	var trimmed_pool: Array[Item] = []
@@ -79,7 +103,7 @@ func get_random_item(pool: ItemPool, override_rolls := false) -> Item:
 	# If no item can be given to the player, just give them treasure
 	if trimmed_pool.size() == 0:
 		return get_random_roll_fail_item()
-
+	
 	# Quality-scaled rarity
 	var quality_trimmed_pool: Array[Item] = []
 	# Rarity goal determines what item rarities we want to allow into the pool.
@@ -275,7 +299,6 @@ func get_laff_rate() -> float:
 
 const BEAN_GOAL := 30
 const LIKELIHOOD_PER_BEAN := 0.05
-var BEAN_POOL: ItemPool
 func get_bean_rate() -> float:
 	if not is_instance_valid(Util.get_player()):
 		return 0.0
@@ -337,3 +360,36 @@ func display_item(item : Item) -> Control:
 	ui.item = item
 	get_tree().get_root().add_child(ui)
 	return ui
+
+## Attempts to return the centralized version of the item pool
+## If none exists, just returns the pool given
+func get_centralized_pool(pool: ItemPool) -> ItemPool:
+	var path := pool.resource_path
+	if path in POOLS.keys():
+		return POOLS[path]
+	return pool
+
+## If a centralized item pool exists, it will return that
+## Otherwise, it will make a new centralized pool and return that
+func pool_from_path(path: String) -> ItemPool:
+	if path in POOLS.keys():
+		return POOLS[path]
+	else:
+		return create_centralized_pool(path)
+
+func create_centralized_pool(path: String) -> ItemPool:
+	var new_pool: ItemPool = load(path)
+	POOLS[path] = new_pool
+	return new_pool
+
+
+#region Pool Pointers
+var BEAN_POOL: ItemPool:
+	get: return pool_from_path("res://objects/items/pools/jellybeans.tres")
+var REWARD_POOL: ItemPool:
+	get: return pool_from_path("res://objects/items/pools/rewards.tres")
+var PROGRESSIVE_POOL: ItemPool:
+	get: return pool_from_path("res://objects/items/pools/progressives.tres")
+
+
+#endregion

@@ -54,8 +54,6 @@ var debug_gag_points := false
 @export var drop_aftershock_round_boost := 0
 @export var trap_knockback_percent := 0.0
 
-@export var funny_dance := false
-@export var doodlechest := false
 @export var anomaly_boost := 0
 # Extra value on laff boosts
 @export var laff_boost_boost := 0
@@ -142,8 +140,6 @@ func max_out() -> void:
 		max_hp = 100
 		hp = 100
 		turns = character.base_stats.max_turns
-	if character.character_name == 'Megasnoop':
-		funny_dance = true
 	for track in gags_unlocked:
 		gags_unlocked[track] = 7
 		gag_balance[track] = 10
@@ -179,7 +175,8 @@ func attempt_revive(_hp: int) -> void:
 		return
 	
 	extra_lives -= 1
-	Util.get_player().quick_heal(Util.get_player().stats.max_hp / 2)
+	var revive_amount := maxi(1, Util.get_player().stats.max_hp / 2)
+	Util.get_player().quick_heal(revive_amount)
 	
 	# Create the unite effect
 	var unite: GPUParticles3D = load('res://objects/battle/effects/unite/unite.tscn').instantiate()

@@ -31,26 +31,6 @@ const MovieTypeToLevel: Dictionary = {
 @export var custom_description: String
 @export var status_effect: StatusEffect
 
-func action() -> void:
-	var target = targets[0]
-	var button: Node3D
-	manager.s_focus_char.emit(user)
-	user.set_animation('button_press')
-	user.face_position(target.global_position)
-	# Place button in hand
-	button = load('res://models/props/gags/button/toon_button.tscn').instantiate()
-	user.toon.left_hand_bone.add_child(button)
-	
-	# Wait for button press
-	await manager.sleep(2.3)
-	AudioManager.play_sound(load('res://audio/sfx/battle/gags/AA_trigger_box.ogg'))
-	await manager.sleep(0.2)
-	
-	if button:
-		button.queue_free()
-	
-	apply(target)
-
 func apply(target: Player) -> void:
 	var sfx: AudioStream
 	if movie_type == MovieType.LADDER:
