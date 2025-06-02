@@ -2,9 +2,6 @@ extends Node
 
 <<<<<<< HEAD
 const VERSION_NUMBER := "v1.1.1a-MEGAMIX"
-=======
-const VERSION_NUMBER := "v1.1.1a"
->>>>>>> parent of 36fe32a (FOSS Release: v1.1.1b)
 
 ## Holds any value you may want accessible globally and quickly
 
