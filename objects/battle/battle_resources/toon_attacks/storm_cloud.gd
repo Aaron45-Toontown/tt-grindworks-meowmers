@@ -1,17 +1,21 @@
 extends GagSquirt
 class_name StormCloud
 
+var skip_button_movie = false
+var do_damage = true
 
 func action():
 	# Start
 	manager.s_focus_char.emit(user)
 	var target = targets[0]
-	user.set_animation('button_press')
-	user.face_position(target.global_position)
-	
-	# Place button in hand
 	var button = load('res://models/props/gags/button/toon_button.tscn').instantiate()
-	user.toon.left_hand_bone.add_child(button)
+	if skip_button_movie != true:
+		user.set_animation('button_press')
+		user.face_position(target.global_position)
+		
+		# Place button in hand
+		user.toon.left_hand_bone.add_child(button)
+		await manager.sleep(2.3)
 	
 	# Place a storm cloud above the cog
 	var cloud = load('res://models/props/gags/storm_cloud/storm_cloud.tscn').instantiate()
@@ -21,7 +25,9 @@ func action():
 	cloud.rotation = Vector3(0,0,0)
 	
 	# Activate cloud after button press
-	await manager.sleep(2.3)
+	if skip_button_movie != true:
+		await manager.sleep(2.3)
+
 	cloud.get_node('AnimationPlayer').play('rain')
 	cloud.get_node('RainDrops').emitting = true
 	manager.s_focus_char.emit(target)
@@ -35,20 +41,31 @@ func action():
 		var was_lured: bool = target.lured
 		if not get_immunity(target):
 			s_hit.emit()
-			AudioManager.play_sound(load("res://audio/sfx/battle/gags/squirt/AA_throw_stormcloud.ogg"))
-			manager.affect_target(target, damage)
-			if target.lured:
-				manager.knockback_cog(target)
-				do_dizzy_stars(target)
+			if do_damage:
+				AudioManager.play_sound(load("res://audio/sfx/battle/gags/squirt/AA_throw_stormcloud.ogg"))
 			else:
-				target.set_animation('soak')
-				do_dizzy_stars(target)
+				AudioManager.play_sound(load("res://audio/sfx/battle/gags/squirt/AA_throw_stormcloud_miss.ogg"))
+			if do_damage:
+				manager.affect_target(target, damage)
+			elif do_damage == false:
+				print("Meowmers status effect was what triggered this so don't deal any damage")
+			if target.lured and do_damage != false:
+				manager.knockback_cog(target)
+			else:
+				if do_damage != false:
+					target.set_animation('soak')
+				##else:
+					##target.set_animation('squirt-small')
 			apply_debuff(target)
+			if do_damage == false:
+				manager.battle_text(target, "Drenched!", BattleText.colors.orange[0], BattleText.colors.orange[1])
 			await Task.delay(0.5 * (2 if was_lured else 1))
-			manager.battle_text(target, "Drenched!", BattleText.colors.orange[0], BattleText.colors.orange[1])
+			if do_damage != false:
+				manager.battle_text(target, "Drenched!", BattleText.colors.orange[0], BattleText.colors.orange[1])
 		else:
 			manager.battle_text(target, "IMMUNE")
-		await manager.barrier(target.animator.animation_finished, 5.0)
+		if do_damage != false:
+			await manager.barrier(target.animator.animation_finished, 5.0)
 		await manager.check_pulses(targets)
 	else:
 		AudioManager.play_sound(load("res://audio/sfx/battle/gags/squirt/AA_throw_stormcloud_miss.ogg"))

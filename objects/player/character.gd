@@ -47,9 +47,7 @@ func get_true_summary() -> String:
 			desc += "\n- %s" % achievement_qualities[entry]
 	return desc
 
-
-## CINDY SPRINKLES: DELAYED TO 1.1.3
-## REVISION BASED ON FEEDBACK:
-## Starts with Dragon Wings
-## Starts with 200000 Jellybeans
-## Starts with 8 Turns
+## NEXT CHARACTER V1.1.2: CINDY SPRINKLES
+## Can only access Throw
+## Starts with Fedora
+## Can't get more than 1 Turn

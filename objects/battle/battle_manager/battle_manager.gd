@@ -3,6 +3,8 @@ class_name BattleManager
 
 const ACTION_TIMEOUT_TIME := 60.0
 
+const ITEM_POOL_PROGRESSIVES := "res://objects/items/pools/progressives.tres"
+
 const CRIT_SFX_1 := preload("res://audio/sfx/battle/gags/crit/crit_1.ogg")
 const CRIT_SFX_2 := preload("res://audio/sfx/battle/gags/crit/crit_2.ogg")
 const CRIT_SFX_3 := preload("res://audio/sfx/battle/gags/crit/crit_3.ogg")
@@ -15,6 +17,7 @@ const CRIT_SFX: Array = [CRIT_SFX_1, CRIT_SFX_2, CRIT_SFX_3, CRIT_SFX_4]
 @onready var summary_label := $SummaryLabel
 
 ## Locals
+var battle_do_damage := true
 var player = Util.get_player()
 var cogs: Array[Cog]
 var battle_node: BattleNode
@@ -234,7 +237,11 @@ func end_battle() -> void:
 		await battle_win_movie.action()
 	s_battle_ending.emit()
 	s_focus_char.emit(player)
-	player.set_animation('victory_dance')
+	if player.stats.funny_dance:
+		player.set_animation('happy_dance')
+		AudioManager.play_sound(load('res://audio/sfx/battle/gags/toonup/AA_heal_happydance.ogg'))
+	else:
+		player.set_animation('victory_dance')
 	player.game_timer_tick = false
 	await player.animator.animation_finished
 	player.game_timer_tick = true
@@ -260,7 +267,7 @@ func spawn_reward() -> void:
 			chest.global_position = battle_node.global_position
 			chest.global_rotation = battle_node.global_rotation
 			if player.better_battle_rewards == true and current_round <= 2:
-				chest.item_pool = ItemService.PROGRESSIVE_POOL
+				chest.item_pool = load(ITEM_POOL_PROGRESSIVES)
 				player.boost_queue.queue_text("Bounty!", Color.GREEN)
 			else:
 				chest.item_pool = battle_node.item_pool
@@ -308,8 +315,10 @@ func barrier(_signal: Signal, timeout: float = 10.0) -> Signal:
 func affect_target(target: Node3D, amount: float, ignore_current_action := false) -> int:
 	# Some cog attacks may want to do "true damage" and ignore all incoming and outgoing stats.
 	# If so, they will set to ignore the current action, making the incoming damage the "true damage"
+	battle_do_damage = true
 	if current_action and is_instance_of(current_action, CogAttack) and current_action.ignore_stats:
 		ignore_current_action = true
+
 
 	var stat: String = 'hp'
 
@@ -349,13 +358,16 @@ func affect_target(target: Node3D, amount: float, ignore_current_action := false
 	if sign(target.stats.get(stat) - pre_stat) == -1:
 		if target is Player:
 			string = str(target.stats.get(stat) - pre_stat)
-			if current_action and current_action.user and current_action.user is Cog:
-				# If target is the player, and this guy is a cog,
-				# mark it as the player's last damage source for the death screen
-				target.last_damage_source = current_action.user.dna.cog_name
-			# Also apply a custom death source message if we have one
-			if current_action and current_action.custom_player_death_source:
-				target.last_damage_source = current_action.custom_player_death_source
+			if battle_do_damage != false:
+				if current_action and current_action.user and current_action.user is Cog:
+					# If target is the player, and this guy is a cog,
+					# mark it as the player's last damage source for the death screen
+					target.last_damage_source = current_action.user.dna.cog_name
+				# Also apply a custom death source message if we have one
+				if current_action and current_action.custom_player_death_source:
+					target.last_damage_source = current_action.custom_player_death_source
+			else:
+				return 0
 		else:
 			if should_crit:
 				raise_height = 0.4

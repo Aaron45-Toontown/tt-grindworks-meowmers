@@ -1,0 +1,86 @@
+[gd_resource type="Resource" script_class="PlayerCharacter" load_steps=29 format=3 uid="uid://rit7k2d2sktp"]
+
+[ext_resource type="Script" uid="uid://o2fe7ud1faj6" path="res://objects/battle/battle_resources/stats.gd" id="1_70vup"]
+[ext_resource type="Script" uid="uid://c8kas2j4io1jh" path="res://objects/toon/clothing/toon_bottoms.gd" id="2_dj0eb"]
+[ext_resource type="Texture2D" uid="uid://dl8481yh02k8h" path="res://models/toon/textures/clothes/shorts/meowmers_shorts.jpg" id="3_w6epp"]
+[ext_resource type="Script" uid="uid://yg7gxug4rab" path="res://objects/toon/toon_dna.gd" id="4_w6epp"]
+[ext_resource type="Script" uid="uid://dfqwh4jmdy0iw" path="res://objects/toon/clothing/toon_shirt.gd" id="5_d2t1n"]
+[ext_resource type="Texture2D" uid="uid://djvitmppr58ic" path="res://models/toon/textures/clothes/shirts/meowmers_shirt.jpg" id="6_d2t1n"]
+[ext_resource type="Texture2D" uid="uid://br1r5g4rv0fnl" path="res://models/toon/textures/clothes/shirts/meowmers_sleeve.jpg" id="7_w66ob"]
+[ext_resource type="Script" uid="uid://b6b6pfoqyolr" path="res://objects/battle/battle_resources/gag_loadouts/track.gd" id="8_qeupi"]
+[ext_resource type="Script" uid="uid://ts8xpgftpmty" path="res://objects/player/character.gd" id="9_e7ooy"]
+[ext_resource type="Resource" uid="uid://5dld88ul3rb5" path="res://objects/battle/battle_resources/gag_loadouts/gag_tracks/trap.tres" id="10_3120v"]
+[ext_resource type="Script" uid="uid://combwqypom1ru" path="res://objects/items/classes/item.gd" id="10_e74dl"]
+[ext_resource type="Resource" uid="uid://btiq58snet4xi" path="res://objects/battle/battle_resources/gag_loadouts/gag_tracks/sound_meowmers.tres" id="12_e7ooy"]
+[ext_resource type="Resource" uid="uid://ql80fm00mhdd" path="res://objects/battle/battle_resources/gag_loadouts/gag_tracks/lure_meowmers.tres" id="12_ohrug"]
+[ext_resource type="Resource" uid="uid://bed0hxns3is4g" path="res://objects/items/resources/accessories/hats/fedora.tres" id="13_he2ya"]
+[ext_resource type="Resource" uid="uid://0528viy6hdsv" path="res://objects/battle/battle_resources/gag_loadouts/gag_tracks/throw.tres" id="13_srtfq"]
+[ext_resource type="Resource" uid="uid://lf7h5xkbt2op" path="res://objects/battle/battle_resources/gag_loadouts/gag_tracks/drop.tres" id="14_he2ya"]
+[ext_resource type="Resource" uid="uid://62skk8psjx2a" path="res://objects/items/resources/accessories/glasses/dorky_glasses.tres" id="14_hqvip"]
+[ext_resource type="Resource" uid="uid://dvxiqtapdvmj4" path="res://objects/battle/battle_resources/gag_loadouts/gag_tracks/squirt.tres" id="14_ucxb7"]
+[ext_resource type="Script" uid="uid://ckypnf7t805p3" path="res://objects/battle/battle_resources/gag_loadouts/gag_loadout.gd" id="16_paxhx"]
+[ext_resource type="Resource" uid="uid://dy3g7t8wu48ke" path="res://objects/items/resources/passive/aaron_setup.tres" id="18_e74dl"]
+[ext_resource type="Resource" uid="uid://cs5os3uam5mpx" path="res://objects/items/resources/passive/meowmers_boost_sound_damage.tres" id="19_d4u5m"]
+[ext_resource type="Resource" uid="uid://crkswlws27tuq" path="res://objects/items/resources/passive/meowmers_boost.tres" id="20_3l4wf"]
+[ext_resource type="Resource" uid="uid://cuuiafxrn4awf" path="res://objects/items/resources/accessories/backpacks/cog_pack.tres" id="23_qeupi"]
+
+[sub_resource type="Resource" id="Resource_jj61k"]
+script = ExtResource("1_70vup")
+damage = 1.0
+defense = 1.0
+evasiveness = 1.0
+accuracy = 1.0
+speed = 1.25
+max_turns = 4
+max_hp = 25
+hp = 25
+turns = 2
+
+[sub_resource type="Resource" id="Resource_ugrs1"]
+script = ExtResource("2_dj0eb")
+texture = ExtResource("3_w6epp")
+base_color = Color(1, 1, 1, 1)
+color_type = 0
+
+[sub_resource type="Resource" id="Resource_2lryd"]
+script = ExtResource("5_d2t1n")
+shirt_texture = ExtResource("6_d2t1n")
+sleeve_texture = ExtResource("7_w66ob")
+base_color = Color(1, 1, 1, 1)
+sleeve_color = Color(1, 1, 1, 1)
+color_type = 0
+
+[sub_resource type="Resource" id="Resource_ax4gq"]
+script = ExtResource("4_w6epp")
+body_type = 1
+species = 6
+head_index = 0
+eyelashes = false
+skirt = false
+head_color = Color(0, 0.623529, 1, 1)
+torso_color = Color(0, 0.623529, 1, 1)
+leg_color = Color(0, 0.623529, 1, 1)
+shirt = SubResource("Resource_2lryd")
+bottoms = SubResource("Resource_ugrs1")
+
+[sub_resource type="Resource" id="Resource_papud"]
+script = ExtResource("16_paxhx")
+loadout = Array[ExtResource("8_qeupi")]([ExtResource("14_ucxb7"), ExtResource("10_3120v"), ExtResource("12_ohrug"), ExtResource("12_e7ooy"), ExtResource("13_srtfq"), ExtResource("14_he2ya")])
+metadata/_custom_type_script = "uid://ckypnf7t805p3"
+
+[resource]
+script = ExtResource("9_e7ooy")
+character_name = "Aaron"
+character_summary = "- Starts with 2 turns
+- Starts with Sound and 
+ Drop
+- Starting chest will have a Doodle!"
+dna = SubResource("Resource_ax4gq")
+gag_loadout = SubResource("Resource_papud")
+starting_laff = 30
+starting_items = Array[ExtResource("10_e74dl")]([ExtResource("18_e74dl"), ExtResource("19_d4u5m"), ExtResource("20_3l4wf"), ExtResource("13_he2ya"), ExtResource("14_hqvip"), ExtResource("23_qeupi")])
+base_stats = SubResource("Resource_jj61k")
+override_index = -1
+achievement_qualities = Dictionary[int, String]({})
+random_character_stored_name = ""
+achievement_index = 0

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" load_steps=3 format=3 uid="uid://lhcc36faprpp"]
+
+[ext_resource type="Texture2D" uid="uid://d7gsim4q6a7k" path="res://ui_assets/battle/gags/inventory_storm_cloud.png" id="2_1v332"]
+[ext_resource type="Script" uid="uid://dyw1au4g4ytyh" path="res://objects/battle/battle_resources/status_effects/auto_squirt_allcogs.gd" id="2_5t7bu"]
+
+[resource]
+script = ExtResource("2_5t7bu")
+quality = 1
+rounds = 0
+rounds_offset = 0
+icon = ExtResource("2_1v332")
+icon_color = Color(1, 1, 1, 1)
+icon_scale = 1.0
+mini_icon_color = Color(1, 1, 1, 1)
+mini_icon_scale = 1.0
+visible = false
+description = "This is a Status Effect"
+status_name = "Status Effect"
+id = 44

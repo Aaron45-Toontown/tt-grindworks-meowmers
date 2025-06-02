@@ -12,6 +12,8 @@ class_name GagSound
 @export var sfx_blast: AudioStream
 
 var do_knockback := false
+var splash_text := false
+var do_full_damage := false
 
 func action():
 	# Play the movie's sfx
@@ -59,18 +61,18 @@ func action():
 				continue
 			animator_target = target
 			var real_damage = damage
-			if (not target == main_target and not user.inverted_sound_damage) or (user.inverted_sound_damage and target == main_target):
+			if (do_full_damage == false and not target == main_target and not user.inverted_sound_damage) or (user.inverted_sound_damage and target == main_target):
 				real_damage *= 0.5
+			if (do_full_damage != false and not target == main_target and not user.inverted_sound_damage) or (user.inverted_sound_damage and target == main_target):
+				real_damage *= 1.0
 			if get_immunity(target):
 				manager.battle_text(target, 'IMMUNE')
 			else:
 				manager.affect_target(target, real_damage)
 			if not target.lured or not do_knockback:
 				target.set_animation('squirt-small')
-				do_dizzy_stars(target)
 			elif not get_immunity(target):
 				manager.knockback_cog(target)
-				do_dizzy_stars(target)
 		
 		if animator_target:
 			await manager.barrier(animator_target.animator.animation_finished, 5.0)
@@ -110,24 +112,27 @@ func sfx_track():
 		AudioManager.play_sound(sfx_blast)
 
 func get_stats() -> String:
-	var string := "Damage: " + get_main_damage_str() + "\n"\
+	var string := "Damage: " + get_true_damage() + "\n"\
 	+ "Affects: "
 	match target_type:
 		ActionTarget.SELF:
 			string += "Self"
 		ActionTarget.ENEMIES:
 			string += "All Cogs"
+			splash_text = true
 		ActionTarget.ENEMY:
 			string += "One Cog"
 		ActionTarget.ENEMY_SPLASH:
 			string += "Three Cogs"
 
-	string += "\nSplash: %s" % get_splash_damage_str()
+	if splash_text == false:
+		string += "\nSplash: %s" % get_true_damage(0.5)
 
 	return string
 
+
 func get_main_damage_str() -> String:
-	if Util.get_player().inverted_sound_damage:
+	if Util.get_player().inverted_sound_damage and do_full_damage == false:
 		return get_true_damage(0.5)
 	return get_true_damage()
 

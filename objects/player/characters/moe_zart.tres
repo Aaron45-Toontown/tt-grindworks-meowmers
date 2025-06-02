@@ -66,5 +66,6 @@ starting_laff = 30
 starting_items = Array[ExtResource("9_5bb58")]([ExtResource("11_0hcnc"), ExtResource("12_qvy8b")])
 base_stats = SubResource("Resource_ls34v")
 override_index = -1
+achievement_qualities = Dictionary[int, String]({})
 random_character_stored_name = ""
 achievement_index = 16

@@ -56,11 +56,21 @@ var POOL_GRADIENTS : Dictionary[String, String] = {
 const EXTRA_TURN := preload(ExtraTurnItem.BASE_ITEM)
 const POINT_BOOST := preload(PointBoostItem.BASE_ITEM)
 var LAFF_BOOST := load("res://objects/items/resources/passive/laff_boost.tres")
+var DOODLE := load("res://objects/items/resources/passive/doodle.tres")
 var SCRIPTED_PROGRESSION_ITEMS: Dictionary = {
 	0: null,
 	1: EXTRA_TURN,
 	2: POINT_BOOST,
 	3: null,
+	4: EXTRA_TURN,
+	5: LAFF_BOOST,
+}
+
+var MEOWMERS_SCRIPTED_PROGRESSION_ITEMS: Dictionary = {
+	0: DOODLE,
+	1: EXTRA_TURN,
+	2: POINT_BOOST,
+	3: DOODLE,
 	4: EXTRA_TURN,
 	5: LAFF_BOOST,
 }
@@ -113,7 +123,12 @@ func set_light_level(level : float, shader : ShaderMaterial) -> void:
 
 func assign_item(world_item: WorldItem):
 	if scripted_progression and SCRIPTED_PROGRESSION_ITEMS[Util.floor_number] != null:
-		var scripted_item = SCRIPTED_PROGRESSION_ITEMS[Util.floor_number]
+		var character: PlayerCharacter
+		var scripted_item = null
+		if character.character_name == 'Meowmers' or character.character_name == 'Aaron':
+			scripted_item = MEOWMERS_SCRIPTED_PROGRESSION_ITEMS[Util.floor_number]
+		else:
+			scripted_item = SCRIPTED_PROGRESSION_ITEMS[Util.floor_number]
 		# 5th floor has a +8 laff boost
 		if scripted_item == LAFF_BOOST:
 			scripted_item = scripted_item.duplicate()
@@ -124,7 +139,10 @@ func assign_item(world_item: WorldItem):
 	if override_item:
 		world_item.item = override_item
 		return
+	var player = Util.get_player()
 	world_item.pool = item_pool
+	if scripted_progression and SCRIPTED_PROGRESSION_ITEMS[Util.floor_number] == null and player.stats.doodlechest:
+		world_item.item = DOODLE
 
 func _ready() -> void:
 	if Engine.is_editor_hint():
@@ -141,12 +159,12 @@ func do_reroll_chance() -> void:
 	var reward_chest_roll := RandomService.randf_channel('chest_rolls')
 	if reward_chest_roll < Globals.reward_chest_chance:
 		print("Spawning reward pool chest")
-		item_pool = ItemService.REWARD_POOL
+		item_pool = Globals.REWARD_ITEM_POOL
 		if RandomService.randf_channel('chest_rolls') < REWARD_OVERRIDE_CHANCE:
 			override_replacement_rolls = true
 	else:
 		print("Spawning progressive pool chest")
-		item_pool = ItemService.PROGRESSIVE_POOL
+		item_pool = Globals.PROGRESSIVE_ITEM_POOL
 
 func get_chest_tex() -> Texture2D:
 	var texture : Texture2D

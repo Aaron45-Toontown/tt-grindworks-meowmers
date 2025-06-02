@@ -5,7 +5,6 @@ var PAUSE_MENU : PackedScene
 const DEATH_THRESHOLD := -20.0
 const COYOTE_TIME := 0.07
 const IFRAME_TIME := 3.0
-const PAUSE_DELAY := 0.25
 
 ## Object states
 enum PlayerState {
@@ -34,7 +33,7 @@ const DEBUG_COLLISION_PRINT := false
 @export var partners: Array[CharacterBody3D] = []
 
 ## Child References
-@onready var camera: PlayerCamera = %PlayerCamera
+@onready var camera := %PlayerCamera
 @onready var camera_dist: float:
 	set(x):
 		var cam_tween := create_tween()
@@ -85,14 +84,12 @@ var moving := false:
 			assess_anim()
 var base_anim := 'neutral'
 var animator: AnimationPlayer
-var pause_delay := 0.0
 
 ## Item-Manipulated Values
 var see_descriptions: bool = false:
 	set(x):
 		see_descriptions = x
 		%ItemDescriptions.visible = x
-var see_anomalies := false
 var random_cog_heals := false
 var custom_gag_order := false
 var less_shop_items := false
@@ -272,23 +269,16 @@ func _physics_process_walk(delta: float) -> void:
 	if global_position.y < DEATH_THRESHOLD:
 		s_fell_out_of_world.emit(self)
 	
+	if Input.is_action_just_pressed("pause"):
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		get_tree().get_root().add_child(PAUSE_MENU.instantiate())
+	
 	if Input.is_action_just_pressed('toggle_freecam') and SaveFileService.settings_file.dev_tools:
 		var cam := PlayerFreeCam.new(self)
 		cam.fov = camera.fov
 		add_child(cam)
 		cam.global_transform = camera.camera.global_transform
 		set_animation('neutral')
-
-func _process(delta: float) -> void:
-	if not state == PlayerState.WALK:
-		return
-	if pause_delay < PAUSE_DELAY:
-		pause_delay += delta
-		return
-	if Input.is_action_just_pressed("pause"):
-		pause_delay = 0.0
-		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
-		get_tree().get_root().add_child(PAUSE_MENU.instantiate())
 
 func should_sprint() -> bool:
 	if not can_sprint:

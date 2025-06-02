@@ -1,8 +1,6 @@
 extends ToonAttack
 class_name GagTrap
 
-const TRAP_EFFECT := preload("res://objects/battle/battle_resources/status_effects/resources/status_effect_trapped.tres")
-
 # Signals when trap movie is over
 signal s_trap
 signal s_activate
@@ -16,7 +14,7 @@ func activate():
 
 ## Get a properly ID'd version of the trap effect specified
 func get_trap_effect() -> StatusTrapped:
-	var new_effect := TRAP_EFFECT.duplicate()
+	var new_effect := StatusTrapped.new()
 	new_effect.quality = StatusEffect.EffectQuality.NEGATIVE
 	new_effect.gag = self
 	new_effect.rounds = -1
