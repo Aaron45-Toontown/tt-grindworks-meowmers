@@ -1,6 +1,5 @@
 extends Node
 
-<<<<<<< HEAD
 const VERSION_NUMBER := "v1.1.1a-MEGAMIX"
 
 ## Holds any value you may want accessible globally and quickly
